@@ -1,0 +1,25 @@
+{
+  "name": "mailrik",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"vite\" \" nodemon --ignore  \"./*.json\"  server.js \"",
+    "build": "vite build",
+    "start": "cross-env NODE_ENV=production nodemon ./dist/server.js",
+    "lint": "stylelint --fix \"./src/**/*.{css,vue}\""
+  },
+  "dependencies": {
+    "vue": "^3.2.41",
+    "vue-router": "^4.1.6",
+    "vuex": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.2.0",
+    "concurrently": "^7.6.0",
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.20",
+    "vite": "^3.2.3",
+    "vite-plugin-static-copy": "^0.13.0"
+  }
+}
