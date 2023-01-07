@@ -10,9 +10,9 @@ const getAllFolder = async () => {
   return data.json()
 }
 
-const getMessagesByFolder = async (folder, page, limit = 25) => {
+const getMessagesByFolder = async (folder, page, limit = 25, filter = null) => {
   const data = await fetch(
-    `http://localhost:3000/getMessagesByFolder?page=${page}&limit=${limit}&folder=${folder}`
+    `http://localhost:3000/getMessagesByFolder?page=${page}&limit=${limit}&folder=${folder}&filter=${filter}`
   )
   return data.json()
 }

@@ -52,39 +52,7 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      userTheme: 'light-theme',
-    }
-  },
-  created() {
-    const initUserTheme = this.getTheme() || this.getMediaPreference()
-    this.setTheme(initUserTheme)
-  },
-  methods: {
-    toggleTheme() {
-      const activeTheme = localStorage.getItem('user-theme')
-      this.setTheme(
-        activeTheme === 'light-theme' ? 'dark-theme' : 'light-theme'
-      )
-    },
-    setTheme(theme) {
-      localStorage.setItem('user-theme', theme)
-      this.userTheme = theme
-      document.documentElement.className = theme
-    },
-    getTheme() {
-      return localStorage.getItem('user-theme')
-    },
-    getMediaPreference() {
-      const hasDarkPreference = window.matchMedia(
-        '(prefers-color-scheme: dark)'
-      ).matches
-
-      if (hasDarkPreference) return 'dark-theme'
-      return 'light-theme'
-    },
-  },
+  methods: {},
 }
 </script>
 <style>

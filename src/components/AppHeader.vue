@@ -36,7 +36,7 @@
           fill="var(--color-text)"
         />
       </svg>
-      Вернуться
+      {{ $t('goBack') }}
     </span>
     <filtered-messages></filtered-messages>
   </header>
@@ -58,7 +58,7 @@ export default {
 
 <style>
 .header {
-  background: var(--color-accent-bg);
+  background: var(--color-header-bg);
   filter: drop-shadow(0 0 16px rgb(2 13 41 / 0.12));
   height: 56px;
   display: flex;
@@ -66,6 +66,7 @@ export default {
   justify-content: space-between;
   padding: 16px;
   margin-bottom: var(--unit);
+  position: relative;
   z-index: 10;
 }
 .header__go-back {

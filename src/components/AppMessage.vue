@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="full-message__address">
-          Кому: Вы, {{ recipients }}
+          {{ $t('whoIs') }}: {{ $t('you') }}, {{ recipients }}
           <button
             v-if="isVisibleAllRecipients"
             class="full-message__get-all-recipients"
@@ -68,8 +68,10 @@
         />
       </div>
       <div class="attaches__count">
-        Файлов: {{ message.imagesCount }}
-        <button class="attaches__download" @click="loadImgs">Скачать</button>
+        {{ $t('files') }}: {{ message.imagesCount }}
+        <button class="attaches__download" @click="loadImgs">
+          {{ $t('download') }}
+        </button>
         <span class="attaches__size"> ({{ getSizeOfDoc() }}) </span>
       </div>
     </div>
@@ -108,6 +110,13 @@ export default {
     },
     notVisibleRecipients() {
       const recipients = this.message.to.length - this.defaultMaxRecipients
+      if (this.$store.getters.language === 'en') {
+        if (recipients === 1) {
+          return `${recipients} recipient`
+        } else {
+          return `${recipients} recipients`
+        }
+      }
       if (recipients === 1) return `${recipients} получатель`
       if ([2, 3, 4].includes(recipients)) return `${recipients} получателя`
       return `${recipients} получателей`

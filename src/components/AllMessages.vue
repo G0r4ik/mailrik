@@ -7,12 +7,13 @@
       tabindex="0"
       @click="goToMessage(message)"
     >
-      <div class="message__status-wrapper" @click.stop="changeStatus(message)">
-        <div
-          :class="{ 'message__status_not-read': !message.read }"
-          class="message__status"
-        ></div>
-      </div>
+      <icon-status
+        class="message__status-wrapper"
+        @click.stop="changeStatus(message)"
+        :isRead="!message.read"
+      >
+      </icon-status>
+
       <div class="message__user">
         <img
           v-if="message.author?.avatar"
@@ -81,9 +82,8 @@
     @click="resize($event, true)"
     class="messages__load-more"
   >
-    показать еще
+    {{ $t('showMore') }}
   </button>
-  <!-- <span v-else class="message-not-found">Писем нет</span> -->
 </template>
 
 <script>
@@ -92,6 +92,7 @@ import PopupAttach from './PopupAttach.vue'
 import IconBookmark from './svg-icons/IconBookmark.vue'
 import IconImportant from './svg-icons/IconImportant.vue'
 import IconAttach from './svg-icons/IconAttach.vue'
+import IconStatus from './svg-icons/IconStatus.vue'
 import api from '../api.js'
 
 export default {
@@ -101,6 +102,7 @@ export default {
     IconBookmark,
     IconImportant,
     IconAttach,
+    IconStatus,
   },
   data() {
     return {
@@ -120,20 +122,30 @@ export default {
     maxPages() {
       return Math.ceil(this.countMessagesInFolder / 25)
     },
+    currentMessages() {
+      return this.$store.getters.currentMessages
+    },
   },
 
   watch: {
+    currentMessages() {
+      this.db = this.currentMessages
+    },
+
     async currentFolder() {
       this.page = 1
-      this.db = []
+      await this.$store.commit('clearCurrentMessages')
+      const currentFolder = this.currentFolder
+      const page = this.page
       this.countMessagesInFolder = await api.getLengthOfMessagesOfFolder(
         this.currentFolder
       )
-      let messages = await api.getMessagesByFolder(
-        this.currentFolder,
-        this.page
-      )
-      this.db = messages
+
+      await this.$store.dispatch('loadMessages', {
+        currentFolder,
+        page,
+        push: false,
+      })
     },
   },
 
@@ -145,8 +157,13 @@ export default {
     this.countMessagesInFolder = await api.getLengthOfMessagesOfFolder(
       this.currentFolder
     )
-    let messages = await api.getMessagesByFolder('Входящие', this.page)
-    this.db = messages
+    const currentFolder = this.currentFolder
+    const page = this.page
+    await this.$store.dispatch('loadMessages', {
+      currentFolder,
+      page,
+      push: false,
+    })
   },
 
   methods: {
@@ -180,11 +197,19 @@ export default {
       if (main.scrollTop >= main.scrollHeight - 1500 || isButtonClick) {
         console.log('load')
         this.page++
-        let messages = await api.getMessagesByFolder(
-          this.currentFolder,
-          this.page
-        )
-        this.db.push(...messages)
+        // let messages = await api.getMessagesByFolder(
+        //   this.currentFolder,
+        //   this.page
+        // )
+        const currentFolder = this.currentFolder
+        const page = this.page
+        await this.$store.dispatch('loadMessages', {
+          currentFolder,
+          page,
+          push: true,
+        })
+
+        // this.db.push(...messages)
       }
     },
     getFlagIcon(flag) {
@@ -195,22 +220,23 @@ export default {
       main.removeEventListener('scroll', this.throttledResize)
       window.removeEventListener('resize', this.throttledResize)
       await this.$store.commit('setCurrentMessage', message)
+
       this.$router.push('/message')
     },
     timeMessage(date) {
       const mounth = [
-        'янв',
-        'фев',
-        'мар',
-        'апр',
-        'май',
-        'июн',
-        'июл',
-        'авг',
-        'сен',
-        'окт',
-        'ноя',
-        'дек',
+        this.$t('January'),
+        this.$t('February'),
+        this.$t('March'),
+        this.$t('April'),
+        this.$t('May'),
+        this.$t('June'),
+        this.$t('July'),
+        this.$t('August'),
+        this.$t('September'),
+        this.$t('October'),
+        this.$t('November'),
+        this.$t('December'),
       ]
       const now = new Date()
       const dateMessage = new Date(date)
@@ -224,9 +250,8 @@ export default {
       }
       const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       const diff = start - dateMessage
-
-      if (diff <= 0) return 'Сегодня'
-      if (diff <= 1000 * 60 * 60 * 24) return 'Вчера'
+      if (diff <= 0) return this.$t('today')
+      if (diff <= 1000 * 60 * 60 * 24) this.$t('yesterday')
 
       return dateMessage.getDate() + ' ' + mounth[dateMessage.getMonth()]
     },
@@ -281,15 +306,7 @@ export default {
 .message__status-wrapper:hover {
   cursor: pointer;
 }
-.message__status {
-  visibility: hidden;
-  background: var(--color-gray);
-  border-radius: 50%;
-  width: 6px;
-  height: 6px;
-  min-width: 6px;
-  min-height: 6px;
-}
+
 .message__status_not-read {
   visibility: visible;
   background: var(--color-primary);

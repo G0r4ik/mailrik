@@ -33,7 +33,7 @@
               fill="#ffffff"
             />
           </svg>
-          <span>Скачать</span>
+          <span>{{ $t('download') }}</span>
         </span>
       </div>
     </div>

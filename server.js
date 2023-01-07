@@ -130,9 +130,21 @@ const server = http.createServer((req, res) => {
     res.setHeader('Content-Type', MIME['json'])
     const page = queriesParams.page
     const limit = queriesParams.limit
+    const filter = queriesParams.filter
     const startIndex = (page - 1) * limit
     const endIndex = page * limit
-    let messages = allMessages[folder]
+    // let messages = allMessages[folder]
+    let messages
+    if (filter === 'withAttachments') {
+      messages = allMessages[folder].filter(message => message.imagesCount)
+    } else {
+      messages = allMessages[folder]
+    }
+    console.log(messages.length)
+    return res.end(JSON.stringify(messages.slice(startIndex, endIndex)))
+  }
+
+  if (req.url.includes('/getFilteredMessages')) {
     return res.end(JSON.stringify(messages.slice(startIndex, endIndex)))
   }
 
