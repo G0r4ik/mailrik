@@ -7,12 +7,10 @@ export default createStore({
       currentMessage: null,
       currentFolder: 'Входящие',
       currentMessages: [],
-      filter: null,
-      theme: {
-        colorText: null,
-        bg: null,
-      },
+      filter: { unread: false, bookmark: false, withAttachments: false },
       language: localStorage.getItem('language') || 'ru',
+      sortOfMessages: 'newToOld',
+      page: 1,
     }
   },
 
@@ -29,21 +27,25 @@ export default createStore({
     filter(state) {
       return state.filter
     },
-    theme(state) {
-      return state.theme
-    },
     language(state) {
       return state.language
+    },
+    page(state) {
+      return state.page
+    },
+    sortOfMessages(state) {
+      return state.sortOfMessages
     },
   },
 
   actions: {
     async loadMessages(context, obj) {
       let messages = await api.getMessagesByFolder(
-        obj.currentFolder,
-        obj.page,
+        context.getters.currentFolder,
+        context.getters.page,
         25,
-        obj.filter
+        context.getters.filter,
+        context.getters.sortOfMessages
       )
       if (obj.push) return context.commit('pushCurrentMessages', messages)
       context.commit('setCurrentMessages', messages)
@@ -51,6 +53,20 @@ export default createStore({
   },
 
   mutations: {
+    changePage(state, page) {
+      state.page = page
+    },
+    changeSort(state, sort) {
+      state.sortOfMessages = sort
+    },
+    setFilter(state, filter) {
+      state.filter[filter] = !state.filter[filter]
+    },
+    clearFilter(state) {
+      state.filter.withAttachments = false
+      state.filter.unread = false
+      state.filter.bookmark = false
+    },
     setCurrentMessage(state, currentMessage) {
       state.currentMessage = currentMessage
     },
@@ -69,12 +85,6 @@ export default createStore({
     },
     clearCurrentMessages(state) {
       state.currentMessages = []
-    },
-    filteredCurrentMessages(state, filter) {
-      if (filter === 'all') {
-      }
-
-      // state.currentMessages = state.currentMessages.filter(message => )
     },
   },
 })

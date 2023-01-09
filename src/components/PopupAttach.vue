@@ -55,7 +55,6 @@ export default {
       return window.URL.createObjectURL(attach)
     },
     getSizeOfDoc(imagesCount) {
-      // const imagesCount = this.imagesCount
       if (imagesCount <= 1000) {
         return imagesCount + ' bit'
       } else if (imagesCount > 1000 && imagesCount < 1_000_000) {
@@ -71,7 +70,6 @@ export default {
       this.timer2 = setTimeout(() => {
         this.currentAttach = null
       }, 3000)
-      console.log(attach)
       this.currentAttach = this.url(attach)
     },
     downloadImage() {
@@ -100,8 +98,8 @@ export default {
 .popup-atcach {
   position: absolute;
   right: 95px;
-  top: 0;
   z-index: 100;
+  top: 0;
   background: var(--color-background);
   border-radius: 12px;
   padding: var(--unit) 0;
@@ -131,7 +129,7 @@ export default {
   position: absolute;
   padding: 4px;
   right: 205px;
-  top: -25px;
+  top: 0px;
   background: var(--color-background);
   box-shadow: 0 4px 32px rgb(0 16 61 / 0.24);
   border-radius: 12px;

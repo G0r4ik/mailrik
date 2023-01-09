@@ -297,8 +297,6 @@ export default {
         .href
     },
     setTheme(theme) {
-      console.log(theme)
-      // if (!theme.themeBg) return
       if (theme.darkOrLight) {
         document.documentElement.className = theme.darkOrLight
       }
@@ -307,10 +305,10 @@ export default {
           `../assets/${theme.themeBgImg}.jpg`,
           import.meta.url
         ).href
-        console.log(img)
         document.body.style.background = `url(${img}`
         document.body.style.backgroundSize = 'cover'
       }
+      console.log(theme)
       document.documentElement.style.setProperty(
         `--color-sidebar-text`,
         `var(--color-text-${theme.sidebarColor})`
@@ -330,26 +328,6 @@ export default {
       document.body.style.background = theme.themeBg
       this.currentTheme = theme
       localStorage.setItem('user-theme', JSON.stringify(theme))
-
-      // if (theme.themeBg.includes('#')) {
-      //   // document.body.style.background = theme
-      //   // const headerBg = `rgba(${this.hexToRgb()}, 0.3)`
-      //   // console.log(headerBg)
-      //   // document.querySelector('header').style.background = headerBg
-      //   // document.documentElement.className = 'light-theme'
-      // } else if (theme === 'light-theme' || theme === 'dark-theme') {
-      //   document.documentElement.className = theme
-      //   document.body.style.background = `var(--color-background)`
-      // } else if (theme !== 'light-theme' && theme !== 'dark-theme') {
-      //   document.documentElement.className = 'light-theme'
-      //   document.documentElement.setAttribute(
-      //     'style',
-      //     `--color-sidebar-text: var(--color-text-light)`
-      //   )
-      //   // const img = new URL(`../assets/${theme}.jpg`, import.meta.url).href
-      //   // document.body.style.background = `url(${img}`
-      //   // document.body.style.backgroundSize = 'cover'
-      // }
     },
     getTheme() {
       return JSON.parse(localStorage.getItem('user-theme'))
@@ -359,8 +337,9 @@ export default {
         '(prefers-color-scheme: dark)'
       ).matches
 
-      if (hasDarkPreference) return 'dark-theme'
-      return 'light-theme'
+      if (hasDarkPreference)
+        return this.anotherThemes.find(t => t.id === 'default-dark')
+      return this.anotherThemes.find(t => t.id === 'default-light')
     },
     hexToRgb(hex) {
       const bigint = parseInt(hex, 16)

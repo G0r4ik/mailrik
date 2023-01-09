@@ -1,5 +1,5 @@
 <template>
-  <div class="messages">
+  <div class="messages" id="id1">
     <div
       v-for="message of db"
       :key="message"
@@ -78,7 +78,7 @@
     </div>
   </div>
   <button
-    v-if="page < maxPages && db.length"
+    v-if="$store.getters.page < maxPages && db.length"
     @click="resize($event, true)"
     class="messages__load-more"
   >
@@ -128,24 +128,26 @@ export default {
   },
 
   watch: {
-    currentMessages() {
+    async currentMessages() {
       this.db = this.currentMessages
+      const filters = this.$store.getters.filter
+      this.countMessagesInFolder = await api.getLengthOfMessagesOfFolder(
+        this.currentFolder,
+        filters
+      )
     },
 
     async currentFolder() {
-      this.page = 1
+      this.$store.commit('changePage', 1)
       await this.$store.commit('clearCurrentMessages')
-      const currentFolder = this.currentFolder
-      const page = this.page
-      this.countMessagesInFolder = await api.getLengthOfMessagesOfFolder(
-        this.currentFolder
-      )
 
-      await this.$store.dispatch('loadMessages', {
-        currentFolder,
-        page,
-        push: false,
-      })
+      const filters = this.$store.getters.filter
+      this.countMessagesInFolder = await api.getLengthOfMessagesOfFolder(
+        this.currentFolder,
+        filters
+      )
+      this.$store.commit('changePage', 1)
+      await this.$store.dispatch('loadMessages', { push: false })
     },
   },
 
@@ -154,16 +156,13 @@ export default {
     const main = document.querySelector('.main')
     main.addEventListener('scroll', this.throttledResize)
     window.addEventListener('resize', this.throttledResize)
+    const filters = this.$store.getters.filter
     this.countMessagesInFolder = await api.getLengthOfMessagesOfFolder(
-      this.currentFolder
+      this.currentFolder,
+      filters
     )
-    const currentFolder = this.currentFolder
-    const page = this.page
-    await this.$store.dispatch('loadMessages', {
-      currentFolder,
-      page,
-      push: false,
-    })
+
+    await this.$store.dispatch('loadMessages', { push: false })
   },
 
   methods: {
@@ -191,25 +190,13 @@ export default {
       }
     },
     async resize(e, isButtonClick = false) {
-      if (this.maxPages <= this.page || !this.db.length) return
+      if (this.maxPages <= this.$store.getters.page || !this.db.length) return
 
       const main = document.querySelector('.main')
       if (main.scrollTop >= main.scrollHeight - 1500 || isButtonClick) {
         console.log('load')
-        this.page++
-        // let messages = await api.getMessagesByFolder(
-        //   this.currentFolder,
-        //   this.page
-        // )
-        const currentFolder = this.currentFolder
-        const page = this.page
-        await this.$store.dispatch('loadMessages', {
-          currentFolder,
-          page,
-          push: true,
-        })
-
-        // this.db.push(...messages)
+        this.$store.commit('changePage', this.$store.getters.page + 1)
+        await this.$store.dispatch('loadMessages', { push: true })
       }
     },
     getFlagIcon(flag) {

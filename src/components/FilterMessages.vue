@@ -3,17 +3,20 @@
     <div class="filter-messages__select filter-select-control">
       <div class="filter-select-control__icons">
         <icon-status
-          v-if="filters.unread"
+          v-if="$store.getters.filter.unread"
           class="filter-list__icon"
           :isRead="true"
         >
         </icon-status>
         <icon-bookmark
-          v-if="filters.bookmark"
+          v-if="$store.getters.filter.bookmark"
           class="filter-list__icon"
           :active="true"
         ></icon-bookmark>
-        <icon-attach v-if="filters.withAttachments" class="filter-list__icon">
+        <icon-attach
+          v-if="$store.getters.filter.withAttachments"
+          class="filter-list__icon"
+        >
         </icon-attach>
       </div>
       <button
@@ -42,7 +45,7 @@
       <ul class="filter-list__inner">
         <li
           class="filter-list__item"
-          :class="{ 'filter-list__item-checked': allMessage }"
+          :class="{ 'filter-list__item_checked': allMessage }"
           @click="filteredMessages('all')"
         >
           <svg
@@ -64,7 +67,7 @@
         </li>
         <li
           class="filter-list__item"
-          :class="{ 'filter-list__item-checked': filters.unread }"
+          :class="{ 'filter-list__item_checked': $store.getters.filter.unread }"
           @click="filteredMessages('unread')"
         >
           <svg
@@ -87,7 +90,9 @@
         </li>
         <li
           class="filter-list__item"
-          :class="{ 'filter-list__item-checked': filters.bookmark }"
+          :class="{
+            'filter-list__item_checked': $store.getters.filter.bookmark,
+          }"
           @click="filteredMessages('bookmark')"
         >
           <svg
@@ -113,7 +118,9 @@
         </li>
         <li
           class="filter-list__item"
-          :class="{ 'filter-list__item-checked': filters.withAttachments }"
+          :class="{
+            'filter-list__item_checked': $store.getters.filter.withAttachments,
+          }"
           @click="filteredMessages('withAttachments')"
         >
           <svg
@@ -135,7 +142,166 @@
           {{ $t('withAttachments') }}
         </li>
       </ul>
-      <button @click="filteredMessages('all')">
+      <div
+        class="filter-list__sort filter-sort"
+        @click="sortVisible = !sortVisible"
+      >
+        {{ $t('sort') }}
+        <ul v-if="sortVisible" @click.stop class="filter-sort__list">
+          <li
+            class="filter-sort__item"
+            :class="{
+              'filter-sort__item_active':
+                $store.getters.sortOfMessages === 'newToOld',
+            }"
+            @click="changeSort('newToOld')"
+          >
+            <svg
+              class="filter-sort__item-arrow"
+              width="10"
+              height="7"
+              viewBox="0 0 10 7"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.39981 0.599805C8.99981 0.199805 8.3998 0.199805 7.9998 0.599805L3.9998 4.5998L1.9998 2.5998C1.5998 2.1998 0.999805 2.1998 0.599805 2.5998C0.199805 2.9998 0.199805 3.5998 0.599805 3.9998L3.2998 6.6998C3.4998 6.8998 3.6998 6.9998 3.9998 6.9998C4.2998 6.9998 4.4998 6.8998 4.6998 6.6998L9.39981 1.9998C9.79981 1.5998 9.79981 0.999805 9.39981 0.599805V0.599805V0.599805Z"
+                fill="#2C2D2E"
+              />
+            </svg>
+            {{ $t('sortNewToOld') }}
+          </li>
+          <li
+            class="filter-sort__item"
+            :class="{
+              'filter-sort__item_active':
+                $store.getters.sortOfMessages === 'oldToNew',
+            }"
+            @click="changeSort('oldToNew')"
+          >
+            <svg
+              class="filter-sort__item-arrow"
+              width="10"
+              height="7"
+              viewBox="0 0 10 7"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.39981 0.599805C8.99981 0.199805 8.3998 0.199805 7.9998 0.599805L3.9998 4.5998L1.9998 2.5998C1.5998 2.1998 0.999805 2.1998 0.599805 2.5998C0.199805 2.9998 0.199805 3.5998 0.599805 3.9998L3.2998 6.6998C3.4998 6.8998 3.6998 6.9998 3.9998 6.9998C4.2998 6.9998 4.4998 6.8998 4.6998 6.6998L9.39981 1.9998C9.79981 1.5998 9.79981 0.999805 9.39981 0.599805V0.599805V0.599805Z"
+                fill="#2C2D2E"
+              />
+            </svg>
+            {{ $t('sortOldToNew') }}
+          </li>
+
+          <li
+            class="filter-sort__item"
+            :class="{
+              'filter-sort__item_active':
+                $store.getters.sortOfMessages === 'authorFirstToLast',
+            }"
+            @click="changeSort('authorFirstToLast')"
+          >
+            <svg
+              class="filter-sort__item-arrow"
+              width="10"
+              height="7"
+              viewBox="0 0 10 7"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.39981 0.599805C8.99981 0.199805 8.3998 0.199805 7.9998 0.599805L3.9998 4.5998L1.9998 2.5998C1.5998 2.1998 0.999805 2.1998 0.599805 2.5998C0.199805 2.9998 0.199805 3.5998 0.599805 3.9998L3.2998 6.6998C3.4998 6.8998 3.6998 6.9998 3.9998 6.9998C4.2998 6.9998 4.4998 6.8998 4.6998 6.6998L9.39981 1.9998C9.79981 1.5998 9.79981 0.999805 9.39981 0.599805V0.599805V0.599805Z"
+                fill="#2C2D2E"
+              />
+            </svg>
+            {{ $t('sortAuthorFirstToLast') }}
+          </li>
+          <li
+            class="filter-sort__item"
+            :class="{
+              'filter-sort__item_active':
+                $store.getters.sortOfMessages === 'authorLastToFirst',
+            }"
+            @click="changeSort('authorLastToFirst')"
+          >
+            <svg
+              class="filter-sort__item-arrow"
+              width="10"
+              height="7"
+              viewBox="0 0 10 7"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.39981 0.599805C8.99981 0.199805 8.3998 0.199805 7.9998 0.599805L3.9998 4.5998L1.9998 2.5998C1.5998 2.1998 0.999805 2.1998 0.599805 2.5998C0.199805 2.9998 0.199805 3.5998 0.599805 3.9998L3.2998 6.6998C3.4998 6.8998 3.6998 6.9998 3.9998 6.9998C4.2998 6.9998 4.4998 6.8998 4.6998 6.6998L9.39981 1.9998C9.79981 1.5998 9.79981 0.999805 9.39981 0.599805V0.599805V0.599805Z"
+                fill="#2C2D2E"
+              />
+            </svg>
+            {{ $t('sortAuthorLastToFirst') }}
+          </li>
+          <li
+            class="filter-sort__item"
+            :class="{
+              'filter-sort__item_active':
+                $store.getters.sortOfMessages === 'titleFirstToLast',
+            }"
+            @click="changeSort('titleFirstToLast')"
+          >
+            <svg
+              class="filter-sort__item-arrow"
+              width="10"
+              height="7"
+              viewBox="0 0 10 7"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.39981 0.599805C8.99981 0.199805 8.3998 0.199805 7.9998 0.599805L3.9998 4.5998L1.9998 2.5998C1.5998 2.1998 0.999805 2.1998 0.599805 2.5998C0.199805 2.9998 0.199805 3.5998 0.599805 3.9998L3.2998 6.6998C3.4998 6.8998 3.6998 6.9998 3.9998 6.9998C4.2998 6.9998 4.4998 6.8998 4.6998 6.6998L9.39981 1.9998C9.79981 1.5998 9.79981 0.999805 9.39981 0.599805V0.599805V0.599805Z"
+                fill="#2C2D2E"
+              />
+            </svg>
+            {{ $t('sortTitleFirstToLast') }}
+          </li>
+          <li
+            class="filter-sort__item"
+            :class="{
+              'filter-sort__item_active':
+                $store.getters.sortOfMessages === 'titleLastToFirst',
+            }"
+            @click="changeSort('titleLastToFirst')"
+          >
+            <svg
+              class="filter-sort__item-arrow"
+              width="10"
+              height="7"
+              viewBox="0 0 10 7"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.39981 0.599805C8.99981 0.199805 8.3998 0.199805 7.9998 0.599805L3.9998 4.5998L1.9998 2.5998C1.5998 2.1998 0.999805 2.1998 0.599805 2.5998C0.199805 2.9998 0.199805 3.5998 0.599805 3.9998L3.2998 6.6998C3.4998 6.8998 3.6998 6.9998 3.9998 6.9998C4.2998 6.9998 4.4998 6.8998 4.6998 6.6998L9.39981 1.9998C9.79981 1.5998 9.79981 0.999805 9.39981 0.599805V0.599805V0.599805Z"
+                fill="#2C2D2E"
+              />
+            </svg>
+            {{ $t('sortTitleLastToFirst') }}
+          </li>
+        </ul>
+      </div>
+      <button @click="filteredMessages('reset')">
         {{ $t('resetEverything') }}
       </button>
     </div>
@@ -156,31 +322,37 @@ export default {
         bookmark: false,
         withAttachments: false,
       },
+      sortVisible: true,
     }
   },
   computed: {
     allMessage() {
-      return Object.values(this.filters).every(k => k === false)
+      return Object.values(this.$store.getters.filter).every(k => k === false)
     },
   },
 
   methods: {
+    async changeSort(sort) {
+      console.log(sort, this.$store.getters.sortOfMessages)
+      if (this.$store.getters.sortOfMessages === sort) return
+      this.$store.commit('changeSort', sort)
+      await this.$store.commit('clearCurrentMessages')
+      this.$store.commit('changePage', 1)
+      await this.$store.dispatch('loadMessages', { push: false })
+    },
+
     async filteredMessages(filter) {
       if (filter === 'all') {
-        this.filters.unread = false
-        this.filters.bookmark = false
-        this.filters.withAttachments = false
+        this.$store.commit('clearFilter')
+      } else if (filter === 'reset') {
+        this.$store.commit('clearFilter')
+        this.$store.commit('changeSort', 'newToOld')
       } else {
-        this.filters[filter] = !this.filters[filter]
+        this.$store.commit('setFilter', filter)
       }
-      const currentFolder = this.$store.getters.currentFolder
-      await this.$store.dispatch('loadMessages', {
-        page: 1,
-        currentFolder,
-        push: false,
-        filter,
-      })
-      // this.$emit('filteredMessages', filter)
+      await this.$store.commit('clearCurrentMessages')
+      this.$store.commit('changePage', 1)
+      await this.$store.dispatch('loadMessages', { push: false })
     },
   },
 }
@@ -223,13 +395,52 @@ export default {
   position: absolute;
   left: -15px;
 }
-.filter-list__item-checked .filter-list__item-arrow {
+.filter-list__item_checked .filter-list__item-arrow {
   display: block;
 }
 .filter-list__inner {
   list-style: none;
   border-bottom: 1px solid red;
-  margin-bottom: 18px;
+  /* margin-bottom: 18px; */
+}
+.filter-list__sort {
+  border-bottom: 1px solid red;
+}
+.filter-sort {
+  position: relative;
+}
+.filter-sort__list {
+  position: absolute;
+  left: -160px;
+  top: -50px;
+  list-style: none;
+  background: var(--color-accent-bg);
+  box-shadow: 0px 4px 32px rgba(0, 16, 61, 0.16);
+  border-radius: 12px;
+}
+.filter-sort__list_visible {
+  display: block;
+}
+.filter-sort__item {
+  padding: 18px 14px;
+  padding-left: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.filter-sort__item:not(:last-child) {
+}
+.filter-sort__item:hover {
+  background: var(--color-hover);
+}
+.filter-sort__item-arrow {
+  position: absolute;
+  left: 15px;
+  display: none;
+}
+.filter-sort__item_active .filter-sort__item-arrow {
+  display: block;
 }
 .filter-list__icon {
   width: 16px;

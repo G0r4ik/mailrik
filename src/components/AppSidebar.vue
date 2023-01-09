@@ -223,7 +223,7 @@
     <hr class="sidebar__hr" />
     <div class="sidebar__users-folder user-folder">
       <div
-        v-for="folder of getAllFolder"
+        v-for="folder of getAllFolders"
         :key="folder"
         class="user-folders__item"
         @click="serCurrentFolder(folder)"
@@ -272,7 +272,7 @@
           fill="var(--color-icon)"
         />
       </svg>
-      <span class="sidebar__settings-text"> {{ $t('sidebarSetting') }} </span>
+      <span class="sidebar__settings-text"> {{ $t('sidebarSettings') }} </span>
     </button>
     <app-settings
       @closeSettings="closeSettings()"
@@ -290,13 +290,13 @@ export default {
 
   data() {
     return {
-      getAllFolder: null,
+      getAllFolders: null,
       isOpenSettings: false,
     }
   },
 
   async mounted() {
-    this.getAllFolder = await api.getAllFolder()
+    this.getAllFolders = await api.getAllFolders()
   },
 
   methods: {

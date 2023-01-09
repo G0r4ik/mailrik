@@ -14,9 +14,6 @@ import AppSidebar from './components/AppSidebar.vue'
 
 export default {
   components: { AppSidebar, AppHeader },
-  data() {
-    return {}
-  },
 }
 </script>
 
