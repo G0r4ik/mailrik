@@ -98,13 +98,15 @@ function removeImgFromLetterAndMove(message) {
   message.doc.img = []
 }
 function filterMessages(allMessages, filterObj) {
-  const copyOfAllMessages = [...allMessages]
+  let copyOfAllMessages = [...allMessages]
   if (filterObj.withAttachments) {
-    return copyOfAllMessages.filter(message => message.imagesCount)
-  } else if (filterObj.bookmark) {
-    return copyOfAllMessages.filter(message => message.bookmark)
-  } else if (filterObj.unread) {
-    return copyOfAllMessages.filter(message => !message.read)
+    copyOfAllMessages = copyOfAllMessages.filter(message => message.imagesCount)
+  }
+  if (filterObj.bookmark) {
+    copyOfAllMessages = copyOfAllMessages.filter(message => message.bookmark)
+  }
+  if (filterObj.unread) {
+    copyOfAllMessages = copyOfAllMessages.filter(message => !message.read)
   }
   return copyOfAllMessages
 }

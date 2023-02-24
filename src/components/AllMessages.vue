@@ -2,7 +2,7 @@
   <div class="messages" id="id1">
     <div
       v-for="message of db"
-      :key="message"
+      :key="message.id"
       class="messages__item message"
       tabindex="0"
       @click="goToMessage(message)"
